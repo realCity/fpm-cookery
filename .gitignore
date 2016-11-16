@@ -17,3 +17,5 @@ Vagrantfile
 
 # vim backups
 *~
+.idea
+*.iml
