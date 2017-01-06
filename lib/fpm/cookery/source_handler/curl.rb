@@ -68,16 +68,7 @@ module FPM
           when 1
             entries.first
           else
-            # Use the directory that was created last.
-            dir = entries.sort do |a, b|
-              File.stat(a).ctime <=> File.stat(b).ctime
-            end.last
-
-            if File.exist?(dir)
-              dir
-            else
-              raise "Could not find source directory for #{local_path.basename}"
-            end
+            ''
           end
         end
       end
