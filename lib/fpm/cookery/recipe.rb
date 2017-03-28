@@ -2,6 +2,7 @@ require 'erb'
 require 'forwardable'
 require 'fileutils'
 require 'json'
+require 'xmlsimple'
 require 'fpm/cookery/facts'
 require 'fpm/cookery/hiera'
 require 'fpm/cookery/inheritable_attr'
@@ -99,6 +100,48 @@ module FPM
 
         def builddir(path = nil)
           (@builddir ||= tmp_root('tmp-build'))/path
+        end
+
+        def pom_xml_version
+          pom = XmlSimple.xml_in(workdir('pom.xml'))
+          pom['version'][0]
+        end
+
+        def package_json_version(dir = @workdir)
+          version = JSON.parse(File.read(dir/'package.json'))['version']
+          if git_describe_revision != 0
+            version = version + '_SNAPSHOT'
+          else
+            version = version + '_0'
+          end
+          version
+        end
+
+        def git_describe
+          Dir.chdir(workdir) do
+        	`git describe --long`.chomp
+          end
+        end
+
+        def git_describe_parse
+          info = git_describe
+          if info[/(.*?)-(\d+)-g([a-z0-9]{7})/]
+            matches = Regexp.last_match
+            last_tag = matches[1]
+            commits_since_tag = matches[2]
+            commit = matches[3]
+            return last_tag, commits_since_tag, commit
+          else
+            nil
+          end
+        end
+
+        def git_describe_version
+          git_describe_parse[0]
+        end
+
+        def git_describe_revision
+          Integer(git_describe_parse[1])
         end
       end
 
