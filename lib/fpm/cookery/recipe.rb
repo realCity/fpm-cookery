@@ -107,14 +107,16 @@ module FPM
           pom['version'][0]
         end
 
-        def package_json_version(dir = @workdir)
-          version = JSON.parse(File.read(dir/'package.json'))['version']
-          if git_describe_revision != 0
-            version = version + '_SNAPSHOT'
-          else
-            version = version + '_0'
+        def package_json_version
+          Dir.chdir(workdir) do
+            version = JSON.parse(File.read('package.json'))['version']
+            if git_describe_revision != 0
+              version = version + '_SNAPSHOT'
+            else
+              version = version + '_0'
+            end
+            version
           end
-          version
         end
 
         def git_describe
