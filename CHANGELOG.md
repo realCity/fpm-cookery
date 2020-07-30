@@ -1,4 +1,18 @@
-# v0.33.0
+# v0.34.0 (2019-06-01)
+* Use factor defaults for `platform` and `target` values. (FooBarQuaxx / #189)
+* Add `:username` and `:password` parameters to the SVN source handler. (tomeon / #191)
+* Add `Recipe#extract` method to allow custom extraction logic.
+* Fix tmux location in getting started guide. (cvhbsk / #195)
+* Use RPM target for SLES platform. (FooBarQuaxx / #198)
+* Add `targets` block for target specific setting in recipe. (FooBarQuaxx / #199)
+* Ensure `:noop` sources are always treated as fetchable. (tomeon / #200)
+* Allow usage of newer puppet versions. (lukasz-e / #201)
+* Add sha512 checksum support. (b00ga / #202)
+* Remove duplicate require. (FooBarQuaxx / #204)
+* Automatically gunzip gzipped patch files. (davewongillies / #208)
+* Add a golang util. (davewongillies / #209)
+
+# v0.33.0 (2017-07-09)
 * Hiera lookups of recipe data from templated YAML files. (BaxterStockman / #150)
 * Travis-CI build matrix improvements. (thedrow / #155)
 * Expose `lsbcodename` fact. (thedrow / #158)
@@ -17,7 +31,7 @@
 * Add "safe\_yaml" dependency. (davewongillies / #186, #154)
 * Add `rpm_dist` method. (sfzylad / #190)
 
-# v0.32.0
+# v0.32.0 (2016-06-14)
 * Add `sourcedir` accessor that holds the path to the extracted source. (#132)
 * Add support for DirRecipe and Directory Handler. (cas-ei / #147)
 * Extend virtualenv support. (MrPrimate / #146)

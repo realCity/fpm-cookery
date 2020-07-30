@@ -20,7 +20,6 @@ require 'fpm/cookery/package/npm'
 require 'fpm/cookery/package/pear'
 require 'fpm/cookery/package/python'
 require 'fpm/cookery/package/virtualenv'
-require 'fpm/cookery/log'
 
 module FPM
   module Cookery
@@ -33,7 +32,7 @@ module FPM
       extend FPM::Cookery::InheritableAttr
 
       attr_rw :arch, :description, :rpm_dist, :homepage, :maintainer, :md5, :name,
-              :revision, :section, :sha1, :sha256, :spec, :vendor, :version,
+              :revision, :section, :sha1, :sha256, :sha512, :spec, :vendor, :version,
               :pre_install, :post_install, :pre_uninstall, :post_uninstall,
               :license, :omnibus_package, :omnibus_dir, :chain_package,
               :default_prefix
@@ -64,6 +63,10 @@ module FPM
 
         def architectures(archs)
           Array(archs).member?(FPM::Cookery::Facts.arch) and block_given? ? yield : false
+        end
+
+        def targets(valid_targets)
+          Array(valid_targets).member?(FPM::Cookery::Facts.target) and block_given? ? yield : false
         end
 
         def platform
@@ -186,6 +189,11 @@ module FPM
         # so that +source+ can be picked up if it is defined in a +Hiera+ #
         # data file.
         apply unless defer_application
+      end
+
+      # Custom source extraction code, must return the extracted source directory.
+      def extract
+        nil
       end
 
       def to_h

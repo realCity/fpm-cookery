@@ -90,7 +90,7 @@ module FPM
             if source.checksum?
               SourceIntegrityCheck.new(recipe).tap do |check|
                 if check.checksum_missing?
-                  Log.warn 'Recipe does not provide a checksum. (sha256, sha1 or md5)'
+                  Log.warn 'Recipe does not provide a checksum. (sha512, sha256, sha1 or md5)'
                   Log.puts <<-__WARN
   Digest:   #{check.digest}
   Checksum: #{check.checksum_actual}
@@ -123,7 +123,13 @@ module FPM
               extracted_source = File.read(extract_cookie).chomp
               Log.debug "Extract cookie exists, using existing source directory: #{extracted_source}"
             else
-              extracted_source = source.extract
+              # First check if the Recipe#extract method returns a source location
+              extracted_source = recipe.extract
+              if extracted_source.nil?
+                # Recipe extraction method didn't return the extracted source
+                # so we use the extraction method of the source handler
+                extracted_source = source.extract
+              end
               File.open(extract_cookie, 'w', 0644) {|f| f.puts(extracted_source) }
             end
 
@@ -168,7 +174,7 @@ module FPM
               end
             end #end chdir extracted_source
           end #end chdir builddir
-        end #end defined source_handler
+        end #end source_handler.fetchable?
 
         if skip_package?
           Log.info "Package building disabled"

@@ -111,6 +111,12 @@ describe "Recipe" do
     end
   end
 
+  describe "#sha512" do
+    it "can be set" do
+      check_attribute(:sha512, '123456789abcdef')
+    end
+  end
+
   describe "#sha256" do
     it "can be set" do
       check_attribute(:sha256, '123456789abcdef')
@@ -465,6 +471,67 @@ describe "Recipe" do
     end
   end
 
+  describe ".targets" do
+    before do
+      FPM::Cookery::Facts.class_eval do
+        class << self
+          alias_method :target_orig, :target
+          def target; :rpm; end
+        end
+      end
+    end
+
+    after do
+      FPM::Cookery::Facts.class_eval do
+        class << self
+          alias_method :target, :target_orig
+        end
+      end
+    end
+
+    describe "with a list of targets" do
+      it "allows target specific settings" do
+        recipe_klass.class_eval do
+          vendor 'a'
+
+          targets [:rpm, :deb] do
+            vendor 'b'
+          end
+        end
+
+        expect(recipe_klass.new.vendor).to eq('b')
+      end
+    end
+
+    describe "with a single target" do
+      it "allows target specific settings" do
+        recipe_klass.class_eval do
+          vendor 'a'
+
+          targets :rpm do
+            vendor 'b'
+          end
+        end
+
+        expect(recipe_klass.new.vendor).to eq('b')
+      end
+    end
+
+    describe "without a matching target" do
+      it "does not set target specific settings" do
+        recipe_klass.class_eval do
+          vendor 'a'
+
+          targets :deb do
+            vendor 'b'
+          end
+        end
+
+        expect(recipe_klass.new.vendor).to eq('a')
+      end
+    end
+  end
+
   describe ".platform" do
     it 'matches the current platform from FPM::Cookery::Facts' do
       expect(recipe_klass.platform).to eq(FPM::Cookery::Facts.platform)
@@ -665,6 +732,12 @@ describe "Recipe" do
           expect(error.message).to match(/no attribute.*notarecipeattr/)
         end
       end
+    end
+  end
+
+  describe "#extract" do
+    it "returns nil by default" do
+      expect(recipe.extract).to be_nil
     end
   end
 end
